@@ -1,6 +1,6 @@
 import streamlit as st
 from langchain_core.messages import HumanMessage, AIMessage
-from graph import SetupAgent, State
+from graph import SetupMaster, State
 
 def main():
     st.title("Setup/PC Master")

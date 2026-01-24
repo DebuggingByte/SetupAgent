@@ -23,7 +23,7 @@ class Category(BaseModel):
 class SetupMaster():
     def __init__(self, api_key):
         model = st.secrets.get("model", "gpt-4o-mini")
-        self.model = ClassOpenAI(model=model, api_key=api_key)
+        self.model = ChatOpenAI(model=model, api_key=api_key)
 
 
         self.setup_agent_class = SetupAgent(self.model)
