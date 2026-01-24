@@ -7,7 +7,7 @@ class SetupAgent():
     def __init__(self, model):
         self.model = model
         self.system_prompt = """
-        You are a setup/PC expert and master.
+        You are a computer expert and master.
         You will be given a user input and a session history.
         1. You will need to determine if the user is asking about a room setup or a PC build.
         2. If they give a budget, you will need to determine products that match the budget.
