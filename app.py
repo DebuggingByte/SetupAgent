@@ -29,7 +29,7 @@ def main():
 
             try:
 
-                agent = SetupMaster(st.secrets["OPEN_API_KEY"])
+                agent = SetupMaster(st.secrets["OPENAI_API_KEY"])
 
 
                 session_history = []
@@ -54,7 +54,7 @@ def main():
 
 
                 if final_state.get("responseToUser"):
-                    response = final_state.get["responseToUser"]
+                    response = final_state.get("responseToUser")
                     message_placeholder.markdown(response)
 
 
