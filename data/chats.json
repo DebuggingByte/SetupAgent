@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "chats": [
+    {
+      "id": "55552fb1938b452ea484ccb9d862782c",
+      "title": "Chat 4",
+      "messages": []
+    },
+    {
+      "id": "471b4ec8ea754d5f9b0f00cddac50173",
+      "title": "Chat 3",
+      "messages": []
+    },
+    {
+      "id": "0f37e8d106ed4677a54ca0189120656f",
+      "title": "Chat 2",
+      "messages": []
+    },
+    {
+      "id": "bd4ba39315a3401b81d9de628c39fc78",
+      "title": "Chat 1",
+      "messages": []
+    }
+  ]
+}
