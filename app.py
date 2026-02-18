@@ -3,9 +3,27 @@ from langchain_core.messages import HumanMessage, AIMessage
 from graph import SetupMaster, State
 import uuid
 import re
+import os
+import pathlib
+
+
+if not st.user.is_logged_in:
+    st.info("Click below to log in with Google.")
+    st.button("Login with Google", on_click=st.login, args=["google"])
+    st.stop()
+
+
+
+
 
 def _set_page(page: str) -> None:
     st.session_state.page = page
+
+def _toggle_white_mode() -> None:
+    """Toggle white mode on/off"""
+    if "white_mode" not in st.session_state:
+        st.session_state.white_mode = False
+    st.session_state.white_mode = not st.session_state.white_mode
 
 def _ensure_chat_state() -> None:
     """
@@ -96,11 +114,66 @@ def _maybe_update_chat_title(chat: dict) -> None:
             chat["title"] = (raw[:28] + "…") if len(raw) > 29 else raw
             return
 
+def admin_panel():
+    if st.user.email == "ghostsnightmaref@gmail.com":
+        st.markdown(
+            """
+            <style>
+            div[data-testid="stVerticalBlock"]:has(> div#admin-panel-marker) .stButton > button {
+                background: rgba(255,255,255,0.15) !important;
+                color: #fbbf24 !important;
+                border: 1px solid #fbbf24 !important;
+                border-radius: 8px !important;
+                font-weight: 600 !important;
+            }
+            div[data-testid="stVerticalBlock"]:has(> div#admin-panel-marker) .stButton > button:hover {
+                background: rgba(255,255,255,0.25) !important;
+            }
+            </style>
+            <div id="admin-panel-marker"></div>
+            """,
+            unsafe_allow_html=True,
+        )
+        with st.container():
+            st.markdown(
+                """
+                <div style="background: linear-gradient(135deg, #1e3a5f, #2d5986);
+                            padding: 1.5rem 2rem; border-radius: 10px;
+                            border-left: 4px solid #fbbf24;
+                            margin-bottom: -1rem; min-height: 120px;">
+                    <span style="font-size: 1.3rem; font-weight: 600; color: #fbbf24;">
+                        Admin Panel!
+                    </span>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+           
+
 def render_top_nav() -> str:
+    st.success(f"Logged in as: {st.user.email}")
+    st.button("Logout", on_click=st.logout)
+
     if "page" not in st.session_state:
         st.session_state.page = "Chat"
+    if "white_mode" not in st.session_state:
+        st.session_state.white_mode = False
 
-    _, mid, _ = st.columns([1, 2, 1])
+    left, mid, _ = st.columns([1, 2, 1])
+    with left:
+        if st.button("⚙️", key="gear_button", help="Settings"):
+            if "show_settings" not in st.session_state:
+                st.session_state.show_settings = False
+            st.session_state.show_settings = not st.session_state.show_settings
+    
+    # Show settings menu if toggled
+    if st.session_state.get("show_settings", False):
+        with st.expander("⚙️ Settings", expanded=True):
+            if st.button("Setting 1: Toggle White Mode", key="setting1", use_container_width=True):
+                _toggle_white_mode()
+                st.session_state.show_settings = False
+                st.rerun()
+    
     with mid:
         b1, b2 = st.columns(2)
         with b1:
@@ -131,6 +204,8 @@ def render_sidebar() -> None:
 
     _ensure_chat_state()
 
+ 
+
     st.sidebar.button("New chat", use_container_width=True, on_click=_new_chat)
 
     st.sidebar.markdown("---")
@@ -152,7 +227,107 @@ def render_sidebar() -> None:
                 _delete_chat(chat["id"])
                 st.rerun()
 
+    st.sidebar.markdown("---")
+    st.sidebar.markdown(
+        """
+        <div style="background: linear-gradient(135deg, #1e3a5f, #2d5986);
+                    padding: 1rem 1.2rem; border-radius: 10px;
+                    border-left: 3px solid #fbbf24;">
+            <span style="font-size: 1rem; font-weight: 600; color: #fbbf24;">
+                Need help?
+            </span>
+            <p style="color: #cbd5e1; font-size: 0.85rem; margin: 0.5rem 0 0 0;">
+                Message at <a href="mailto:ghostsnightmaref@gmail.com" style="color: #93c5fd; text-decoration: none;">ghostsnightmaref@gmail.com</a>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 def main():
+    admin_panel()
+    # Apply white mode CSS if enabled — polished light theme
+    if st.session_state.get("white_mode", False):
+        st.markdown("""
+        <style>
+        /* Base: soft off-white background */
+        .stApp, [data-testid="stAppViewContainer"] {
+            background: linear-gradient(180deg, #fafbfc 0%, #f0f2f5 100%) !important;
+        }
+        .main .block-container {
+            background: transparent !important;
+            padding-top: 1.5rem !important;
+        }
+        /* Typography: readable dark gray */
+        .stApp h1, .stApp h2, .stApp h3, .stApp p, .stApp label, .stApp span, .stApp div {
+            color: #1a1d21 !important;
+        }
+        .stMarkdown { color: #1a1d21 !important; }
+        /* Sidebar: subtle card-like panel */
+        [data-testid="stSidebar"], .stSidebar {
+            background: linear-gradient(180deg, #ffffff 0%, #f5f6f8 100%) !important;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.06) !important;
+        }
+        [data-testid="stSidebar"] .stMarkdown { color: #1a1d21 !important; }
+        /* Buttons: clean and consistent */
+        .stButton > button {
+            background-color: #ffffff !important;
+            color: #1a1d21 !important;
+            border: 1px solid #d1d5db !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04) !important;
+        }
+        .stButton > button:hover {
+            background-color: #f3f4f6 !important;
+            border-color: #9ca3af !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06) !important;
+        }
+        /* Primary (selected) buttons */
+        .stButton > button[kind="primary"] {
+            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+        }
+        .stButton > button[kind="primary"]:hover {
+            background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%) !important;
+        }
+        /* Chat: user messages — soft blue */
+        .stChatMessage[data-testid="user-message"] {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+            border: 1px solid #bfdbfe !important;
+            border-radius: 12px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+        }
+        /* Chat: assistant messages — soft gray */
+        .stChatMessage[data-testid="assistant-message"] {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+        }
+        /* Fallback for chat messages without data-testid */
+        .stChatMessage {
+            border-radius: 12px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+        }
+        /* Chat input */
+        [data-testid="stChatInput"] {
+            background: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+            border-radius: 12px !important;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
+        }
+        /* Dividers */
+        hr { border-color: #e5e7eb !important; opacity: 0.8; }
+        /* Expander / settings panel */
+        .streamlit-expanderHeader {
+            background: #f8fafc !important;
+            border-radius: 8px !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
     render_sidebar()
     page = render_top_nav()
 

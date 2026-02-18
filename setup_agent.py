@@ -14,6 +14,7 @@ class SetupAgent():
         3. If they give a specific PC build, you will need to determine products that match the build.
         4. You will need to return a list of products that match the user's request.
         5. If they do not give a room setup, pc build or budget, check the session history and match it up, if it does not match up, ask them for clarification.
+        6. When recommending PC parts or products, ALWAYS include a direct purchase link for each item. Use Amazon search URLs in this format: https://www.amazon.com/s?k=PRODUCT+NAME (replace spaces with +). For example, for an "AMD Ryzen 5 7600X", link to https://www.amazon.com/s?k=AMD+Ryzen+5+7600X. Format each product as: **Product Name** — $Price — [Buy on Amazon](link). This makes it easy for the user to find and purchase the parts.
         """
         self.sessionHistory = []
 
