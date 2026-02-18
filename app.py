@@ -170,9 +170,7 @@ def render_top_nav() -> str:
     if st.session_state.get("show_settings", False):
         with st.expander("⚙️ Settings", expanded=True):
             if st.button("Setting 1: Toggle White Mode", key="setting1", use_container_width=True):
-                _toggle_white_mode()
-                st.session_state.show_settings = False
-                st.rerun()
+               pass
     
     with mid:
         b1, b2 = st.columns(2)
